@@ -1,1 +1,1 @@
-google-chrome-stable --kiosk http://netflix.com
+google-chrome-stable --kiosk http://netflix.com &

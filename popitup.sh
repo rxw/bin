@@ -1,21 +1,21 @@
 #!/bin/sh
-
 # how long should the popup remain?
 duration=3
 
 # define geometry
-barx=10
-bary=10
-barw=290
-barh=20
+barx=1168
+bary=8
+barw=170
+barh=16
 
 # colors
-bar_bg="#ff151515"
-bar_fg="#ffffffff" # white is default
+bar_bg="#fffffFFF"
+bar_fg="#ff151515" # white is default
 
 # font used
 bar_font="-*-lemon-*-*-*-10-*-*-*-*-*-*-*"
 
 # compute all this
-baropt="-g ${barw}x${barh}+${barx}+${bary} -B${bar_bg} -f ${bar_font}"
+baropt="-g ${barw}x${barh}+${barx}+${bary} -B${bar_bg} -F${bar_fg} -f ${bar_font}"
+sh /home/tato/bin/killem.sh
 (echo " $@"; sleep ${duration}) | bar ${baropt}
