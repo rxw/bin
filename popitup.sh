@@ -3,19 +3,18 @@
 duration=3
 
 # define geometry
-barx=1168
-bary=8
-barw=170
+barx=1100
+bary=17
+barw=243
 barh=16
 
 # colors
-bar_bg="#fffffFFF"
-bar_fg="#ff151515" # white is default
+bar_bg="#ff353535"
+bar_fg="#ff858585" # white is default
 
 # font used
-bar_font="-*-lemon-*-*-*-10-*-*-*-*-*-*-*"
+bar_font="-*-unifont-*-*-*-*-*-*-*-*-*-*-*"
 
 # compute all this
 baropt="-g ${barw}x${barh}+${barx}+${bary} -B${bar_bg} -F${bar_fg} -f ${bar_font}"
-sh /home/tato/bin/killem.sh
 (echo " $@"; sleep ${duration}) | bar ${baropt}
