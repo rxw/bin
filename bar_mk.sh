@@ -58,8 +58,14 @@ nowplaying() {
 }
 
 playcontrol() {
+  a=$(mpc --format "" | grep -P -o "(?<=\[)[^\[]+(?=\])" )
+  if [ $a = "playing" ]; then
+    icon=""
+  else
+    icon=""
+  fi
   prev="%{A:mpc prev:}%{A}" 
-  toggle="%{A:mpc toggle:}%{A}"
+  toggle="%{A:mpc toggle:}$icon%{A}"
   next=" %{A:mpc next:}%{A}"
   echo "$prev $toggle $next"
 }
