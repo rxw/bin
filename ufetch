@@ -10,7 +10,7 @@
 OS=Arch
 KERNEL=$(uname -rs)
 UPTIME=$(uptime -p | sed s:"up ":"":)
-PACKAGES=$(pkginfo -i | wc -l)
+PACKAGES=$(pacman -Q | wc -l)
 # shell is already defined
 WM=$(tail -n 1 "$HOME/.xinitrc" | cut -d " " -f2)
 
