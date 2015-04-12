@@ -2,8 +2,12 @@
 #
 # z3bra - (c) wtfpl 2014
 # Fetch infos on your computer, and print them to stdout every second.
-#### Colors
+#### Vars
 RED=#FFff9595
+
+grpfg='%{F#ffFFFCB1}%{F-}'
+grpmg='%{F#ff2288cc}%{F-}'
+grpbg='%{F#ffbbbbbb} '
 
 ### Functions
 
@@ -45,10 +49,17 @@ volume() {
 #}
 
 groups() {
-    cur=`xprop -root _NET_CURRENT_DESKTOP | awk '{print $3}'`
-    darr=(%{F#FFff9f9f}%{F-} %{F#FF9fff9f}%{F-} %{F#FF9f9fff}%{F-} %{F#FFff9fff}%{F-})
-    darr[$cur]="%{F#FFFFFA67}%{F-}"
-    echo ${darr[*]}
+  cur=`xprop -root _NET_CURRENT_DESKTOP | awk '{print $3}'`
+  next=$(($cur + 1))
+  all=(   )
+  all[$cur]="${grpfg}"
+  if [ "$cur" = 3 ]; then
+    all[0]="${grpmg}"
+  else
+    all[$next]="${grpmg}"
+  fi
+
+  echo "${all[*]}"
 }
 
 nowplaying() {
@@ -59,7 +70,7 @@ nowplaying() {
 
 playcontrol() {
   a=$(mpc --format "" | grep -P -o "(?<=\[)[^\[]+(?=\])" )
-  if [ $a = "playing" ]; then
+  if [ "$a" = "playing" ]; then
     icon=""
   else
     icon=""
@@ -69,14 +80,20 @@ playcontrol() {
   next=" %{A:mpc next:}%{A}"
   echo "$prev $toggle $next"
 }
-#battery() {
-#BATC=/sys/class/power_supply/BAT0/capacity
-#BATS=/sys/class/power_supply/BAT0/status
-## prepend percentage with a '+' if charging, '-' otherwise
-#test "`cat $BATS`" = "Charging" && echo -n '+' || echo -n '-'
-## print out the content
-#sed -n p $BATC
-#}
+battery() {
+  BATC=/sys/class/power_supply/BAT0/capacity
+  BATS=/sys/class/power_supply/BAT0/status
+  tot=`cat $BATC`
+  if [ $tot -lt 50 ]; then
+    icon=""
+  else
+    icon=""
+  fi
+  # prepend percentage with a '+' if charging, '-' otherwise
+  test "`cat $BATS`" = "Charging" && echo -n '' || echo -n "$icon "
+  # print out the content
+  sed -n p $BATC
+}
 
 # This loop will fill a buffer with our infos, and output it to stdout.
 while :; do
@@ -88,6 +105,7 @@ while :; do
     buf="${buf} %{r} $(volume)%%  "
     buf="${buf} $(playcontrol) "
     buf="${buf}  $(nowplaying) "
+    buf="${buf}  $(battery)%% "
     buf="${buf}  $(clock) "
     buf="${buf}  %{r} "
 
