@@ -59,7 +59,7 @@ nowplaying() {
 
 playcontrol() {
   a=$(mpc --format "" | grep -P -o "(?<=\[)[^\[]+(?=\])" )
-  if [ $a = "playing" ]; then
+  if [ "$a" = "playing" ]; then
     icon=""
   else
     icon=""
@@ -68,6 +68,13 @@ playcontrol() {
   toggle="%{A:mpc toggle:}$icon%{A}"
   next=" %{A:mpc next:}%{A}"
   echo "$prev $toggle $next"
+}
+
+mail() {
+  new=$(cat usr/mail)
+  if [ $new -gt 0 ]; then
+    echo " %{F#FFff9f9f}$new%{F-}"
+  fi
 }
 #battery() {
 #BATC=/sys/class/power_supply/BAT0/capacity
@@ -88,6 +95,7 @@ while :; do
     buf="${buf} %{r} $(volume)%%  "
     buf="${buf} $(playcontrol) "
     buf="${buf}  $(nowplaying) "
+    buf="${buf}  $(mail) "
     buf="${buf}  $(clock) "
     buf="${buf}  %{r} "
 
