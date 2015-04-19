@@ -13,12 +13,12 @@ grpbg='%{F#ffbbbbbb} '
 
 clock() {
   hour=$(date '+%I:%M')
-  echo " $hour"
+  echo " $hour"
 }
 
 volume() {
   vol=$(amixer get Master | sed -n 'N;s/^.*\[\([0-9]\+%\).*$/\1/p')
-  echo "   $vol"
+  echo " $vol"
 }
 
 #$cpuload() {
@@ -50,14 +50,8 @@ volume() {
 
 groups() {
   cur=`xprop -root _NET_CURRENT_DESKTOP | awk '{print $3}'`
-  next=$(($cur + 1))
-  all=(   )
-  all[$cur]="${grpfg}"
-  if [ "$cur" = 3 ]; then
-    all[0]="${grpmg}"
-  else
-    all[$next]="${grpmg}"
-  fi
+  all=("" "" "" "")
+  all[$cur]="%{U#FF37393d}%{+u}${all[${cur}]}%{-u}"
 
   echo "${all[*]}"
 }
@@ -65,20 +59,7 @@ groups() {
 nowplaying() {
     cur=`mpc current`
     # this line allow to choose whether the output will scroll or not
-    echo " $cur"
-}
-
-playcontrol() {
-  a=$(mpc --format "" | grep -P -o "(?<=\[)[^\[]+(?=\])" )
-  if [ "$a" = "playing" ]; then
-    icon=""
-  else
-    icon=""
-  fi
-  prev="%{A:mpc prev:}%{A}" 
-  toggle="%{A:mpc toggle:}$icon%{A}"
-  next=" %{A:mpc next:}%{A}"
-  echo "$prev $toggle $next"
+    echo " $cur"
 }
 
 battery() {
@@ -89,29 +70,42 @@ battery() {
   
   tot=`cat $BATC`
   if [ $tot -lt 50 ]; then
-    icon=""
+    icon=""
   else
-    icon=""
+    icon=""
   fi
+
   # prepend percentage with a '+' if charging, '-' otherwise
-  test "`cat $BATS`" = "Charging" && echo -n '' || echo -n "$icon "
+  test "`cat $BATS`" = "Charging" && echo -n ' ' || echo -n "$icon "
   # print out the content
-  sed -n p $BATC && echo "%%"
+  sed -n p $BATC
+}
+
+windows() {
+  wnd_focus=$(xdotool getwindowfocus)
+  wnd_title=$(xprop -id $wnd_focus WM_NAME)
+  
+  lookfor='"(.*)"' 
+
+  if [[ "$wnd_title" =~ $lookfor ]]; then 
+      wnd_title=${BASH_REMATCH[1]} 
+      echo $wnd_title 
+  fi
 }
 
 # This loop will fill a buffer with our infos, and output it to stdout.
 while :; do
     buf=""
-    buf="%{l} $(groups) "
+    buf="%{l}%{B#FFfafafa}%{F#FF37393d} $(groups) "
    # buf="${buf} network: $(network) | "
    # buf="${buf} CPU: $(cpuload)%% -"
    # buf="${buf} RAM: $(memused)%% -"
-    buf="${buf} %{r} $(volume)%%  "
-    buf="${buf} $(playcontrol) "
+    buf="${buf}%{F-}%{B-}  $(windows) "
+    buf="${buf} %{r} %{B#FFfafafa}%{F#FF37393d} $(volume)  "
     buf="${buf}  $(nowplaying) "
-    buf="${buf}  $(battery) "
+    buf="${buf}  $(battery)% "
     buf="${buf}  $(clock) "
-    buf="${buf}  %{r} "
+    buf="${buf}  %{r} %{B-}%{F-}"
 
     echo $buf
     # use `nowplaying scroll` to get a scrolling output!

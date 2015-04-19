@@ -33,7 +33,7 @@ bc=$(tput bold)		# bold
 cat <<EOF
 
 ${c6}      ___     ${bc}${USER}${c7}@${c6}${HOSTNAME}${rc}
-${c6}     (${c7}.· ${c6}|    ${bc}OS:        ${c7}${OS}${rc}
+${c6}     (${c7}. .${c6}|    ${bc}OS:        ${c7}${OS}${rc}
 ${c6}     (${c3}<> ${c6}|    ${bc}KERNEL:    ${c7}${KERNEL}${rc}
 ${c6}    / ${c7}__  ${c6}\\   ${bc}UPTIME:    ${c7}${UPTIME}${rc}
 ${c6}   ( ${c7}/  \ ${c6}/|  ${bc}PACKAGES:  ${c7}${PACKAGES}${rc}
