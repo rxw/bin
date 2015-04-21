@@ -3,17 +3,12 @@
 # z3bra - (c) wtfpl 2014
 # Fetch infos on your computer, and print them to stdout every second.
 #### Vars
-RED=#FFff9595
-
-grpfg='%{F#ffFFFCB1}%{F-}'
-grpmg='%{F#ff2288cc}%{F-}'
-grpbg='%{F#ffbbbbbb} '
 
 ### Functions
 
 clock() {
   hour=$(date '+%I:%M')
-  echo " $hour"
+  echo " $hour"
 }
 
 volume() {
@@ -50,8 +45,8 @@ volume() {
 
 groups() {
   cur=`xprop -root _NET_CURRENT_DESKTOP | awk '{print $3}'`
-  all=("" "" "" "")
-  all[$cur]="%{U#FF37393d}%{+u}${all[${cur}]}%{-u}"
+  all=("" "" "" "")
+  all[$cur]="%{F#FFfFfFfF}%{F-}"
 
   echo "${all[*]}"
 }
@@ -59,7 +54,7 @@ groups() {
 nowplaying() {
     cur=`mpc current`
     # this line allow to choose whether the output will scroll or not
-    echo " $cur"
+    echo " $cur"
 }
 
 battery() {
@@ -70,25 +65,22 @@ battery() {
   
   tot=`cat $BATC`
   if [ $tot -lt 50 ]; then
-    icon=""
+    icon=""
   else
-    icon=""
+    icon=""
   fi
 
   # prepend percentage with a '+' if charging, '-' otherwise
-  test "`cat $BATS`" = "Charging" && echo -n ' ' || echo -n "$icon "
+  test "`cat $BATS`" = "Charging" && echo -n ' ' || echo -n "$icon "
   # print out the content
   sed -n p $BATC
 }
 
 windows() {
   wnd_focus=$(xdotool getwindowfocus)
-  wnd_title=$(xprop -id $wnd_focus WM_NAME)
   
-  lookfor='"(.*)"' 
-
-  if [[ "$wnd_title" =~ $lookfor ]]; then 
-      wnd_title=${BASH_REMATCH[1]} 
+  if [[ "$wnd_focus" != "%1" ]]; then 
+      wnd_title=$(xdotool getwindowname $wnd_focus )
       echo $wnd_title 
   fi
 }
@@ -96,13 +88,13 @@ windows() {
 # This loop will fill a buffer with our infos, and output it to stdout.
 while :; do
     buf=""
-    buf="%{l}%{B#FFfafafa}%{F#FF37393d} $(groups) "
+    buf="%{l} $(groups) "
    # buf="${buf} network: $(network) | "
    # buf="${buf} CPU: $(cpuload)%% -"
    # buf="${buf} RAM: $(memused)%% -"
-    buf="${buf}%{F-}%{B-}  $(windows) "
-    buf="${buf} %{r} %{B#FFfafafa}%{F#FF37393d} $(volume)  "
-    buf="${buf}  $(nowplaying) "
+    buf="${buf} %{c}| $(windows) |"
+   # buf="${buf} %{r} %{B#FFfafafa}%{F#FF37393d} $(volume)  "
+    buf="${buf} %{r} $(nowplaying) "
     buf="${buf}  $(battery)% "
     buf="${buf}  $(clock) "
     buf="${buf}  %{r} %{B-}%{F-}"
