@@ -1,5 +1,5 @@
 #dmenu_run -nb '#151515' -nf '#aaaAAA' -sb '#353535' -sf '#fffFFF' -l 10 -fn -*-lemon-*-*-*-10-*-*-*-*-*-*
-mon_width=5760
+mon_width=1920
 mon_height=1080
  
 sel_bg=$orange
