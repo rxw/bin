@@ -76,14 +76,14 @@ battery() {
   sed -n p $BATC
 }
 
-windows() {
-  wnd_focus=$(xdotool getwindowfocus)
-  
-  if [[ "$wnd_focus" != "%1" ]]; then 
-      wnd_title=$(xdotool getwindowname $wnd_focus )
-      echo $wnd_title 
-  fi
-}
+#windows() {
+#  wnd_focus=$(xdotool getwindowfocus)
+#  
+#  if [[ "$wnd_focus" != "" ]]; then 
+#      wnd_title=$(xdotool getwindowname $wnd_focus )
+#      echo "| $wnd_title |"
+#  fi
+#}
 
 # This loop will fill a buffer with our infos, and output it to stdout.
 while :; do
@@ -92,7 +92,7 @@ while :; do
    # buf="${buf} network: $(network) | "
    # buf="${buf} CPU: $(cpuload)%% -"
    # buf="${buf} RAM: $(memused)%% -"
-    buf="${buf} %{c}| $(windows) |"
+   # buf="${buf} %{c}$(windows)"
    # buf="${buf} %{r} %{B#FFfafafa}%{F#FF37393d} $(volume)  "
     buf="${buf} %{r} $(nowplaying) "
     buf="${buf}  $(battery)% "
