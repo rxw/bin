@@ -8,12 +8,12 @@
 
 clock() {
   hour=$(date '+%I:%M')
-  echo " $hour"
+  echo " $hour"
 }
 
 volume() {
   vol=$(amixer get Master | sed -n 'N;s/^.*\[\([0-9]\+%\).*$/\1/p')
-  echo " $vol"
+  echo " $vol"
 }
 
 #$cpuload() {
@@ -45,16 +45,13 @@ volume() {
 
 groups() {
   cur=`xprop -root _NET_CURRENT_DESKTOP | awk '{print $3}'`
-  all=("" "" "" "")
-  all[$cur]="%{F#FFfFfFfF}%{F-}"
-
-  echo "${all[*]}"
+  echo "$cur"
 }
 
 nowplaying() {
     cur=`mpc current`
     # this line allow to choose whether the output will scroll or not
-    echo " $cur"
+    echo " $cur"
 }
 
 battery() {
@@ -95,7 +92,7 @@ while :; do
    # buf="${buf} %{c}$(windows)"
    # buf="${buf} %{r} %{B#FFfafafa}%{F#FF37393d} $(volume)  "
     buf="${buf} %{r} $(nowplaying) "
-    buf="${buf}  $(battery)% "
+   # buf="${buf}  $(battery)% "
     buf="${buf}  $(clock) "
     buf="${buf}  %{r} %{B-}%{F-}"
 
