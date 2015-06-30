@@ -8,12 +8,12 @@
 
 clock() {
   hour=$(date '+%I:%M')
-  echo " $hour"
+  echo " $hour"
 }
 
 volume() {
   vol=$(amixer get Master | sed -n 'N;s/^.*\[\([0-9]\+%\).*$/\1/p')
-  echo " $vol"
+  echo "☎ $vol"
 }
 
 #$cpuload() {
@@ -45,16 +45,14 @@ volume() {
 
 groups() {
   cur=`xprop -root _NET_CURRENT_DESKTOP | awk '{print $3}'`
-  all=("" "" "" "")
-  all[$cur]="%{F#FFfFfFfF}%{F-}"
-
-  echo "${all[*]}"
+  
+  echo "$cur"
 }
 
 nowplaying() {
     cur=`mpc current`
     # this line allow to choose whether the output will scroll or not
-    echo " $cur"
+    echo "$cur"
 }
 
 battery() {
@@ -62,28 +60,21 @@ battery() {
   test -z "$BATN" && exit 1
   BATC=/sys/class/power_supply/$BATN/capacity
   BATS=/sys/class/power_supply/$BATN/status
-  
-  tot=`cat $BATC`
-  if [ $tot -lt 50 ]; then
-    icon=""
-  else
-    icon=""
-  fi
 
   # prepend percentage with a '+' if charging, '-' otherwise
-  test "`cat $BATS`" = "Charging" && echo -n ' ' || echo -n "$icon "
+  test "`cat $BATS`" = "Charging" && echo -n '⚡ ' || echo -n " "
   # print out the content
   sed -n p $BATC
 }
 
-windows() {
-  wnd_focus=$(xdotool getwindowfocus)
-  
-  if [[ "$wnd_focus" != "%1" ]]; then 
-      wnd_title=$(xdotool getwindowname $wnd_focus )
-      echo $wnd_title 
-  fi
-}
+#windows() {
+#  wnd_focus=$(xdotool getwindowfocus)
+#  
+#  if [[ "$wnd_focus" != "" ]]; then 
+#      wnd_title=$(xdotool getwindowname $wnd_focus )
+#      echo "| $wnd_title |"
+#  fi
+#}
 
 # This loop will fill a buffer with our infos, and output it to stdout.
 while :; do
@@ -92,7 +83,7 @@ while :; do
    # buf="${buf} network: $(network) | "
    # buf="${buf} CPU: $(cpuload)%% -"
    # buf="${buf} RAM: $(memused)%% -"
-    buf="${buf} %{c}| $(windows) |"
+   # buf="${buf} %{c}$(windows)"
    # buf="${buf} %{r} %{B#FFfafafa}%{F#FF37393d} $(volume)  "
     buf="${buf} %{r} $(nowplaying) "
     buf="${buf}  $(battery)% "

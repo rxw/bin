@@ -1,0 +1,523 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+from __future__ import division
+
+__author__  = 'Ulises Santiago <ulises.osa@gmail.com>'
+__date__    = "Nov2012"
+
+##------------------------------------------------------------------------------
+from numpy import *
+from math import *
+import getopt
+import sys
+import random
+import time
+
+deg2rad = pi/180.
+##------------------------------------------------------------------------------
+def uso(nombre_programa):
+    texto = "uso: " + nombre_programa + """ [OPCIONES]
+
+    DESCRIPCION
+        Programa para crear una aleacion substitucional. Los atomos del soluto
+        se substituyen de forma aleatoria.
+
+    OPCIONES
+        -h --help
+                Muestra esta ayuda y sale.
+
+        -a --parametro_de_red_a=numero
+                Tamanio del parametro de red para un sistema cristalino cubico.
+                Por defecto se utiliza el parametro de red de la plata 4.0857
+                (angstrom).
+
+        -b --parametro_de_red_b=numero
+                Tamanio del parametro de red para un sistema cristalino cubico.
+                Por defecto se utiliza el parametro de red de la plata 4.0857
+                (angstrom).
+
+        -c --parametro_de_red_c=umero
+                Tamanio del parametro de red para un sistema cristalino cubico.
+                Por defecto se utiliza el parametro de red de la plata 4.0857
+                (angstrom).
+
+        -x --concentracion_soluto=numero
+                Concentracion del soluto. Debe darse en fraccion.
+
+        -d --disolvente=nombre
+                Elemento del disolvente en la aleacion. Por defecto es Ag.
+
+        -e --soluto=nombre
+                Elemento del soluto en la aleacion. Por defecto es Au.
+
+        -n --veces_la_arista=numero
+                Numero de veces el parametro de red que se empleara para formar
+                una arista de la super celda. El volumen de la supercelda sera
+                n^3. Por defecto este numero se ajusta a 10.
+
+        -o --output=nombre del sistema
+                Establece el nombre del sistema, este sera el nombre base de los
+                archivos de salida, car y xyz. Si esta opcion no se utiliza el
+                nombre del sistema sera 'AgAu'.
+
+        -s --sistema_base=<fcc|bcc|sc|diamante|...>
+                Indica el sistema cristalino base a considerar para la construccion
+                del cumulo. Por defecto se utilizara el sistema fcc.
+
+        -f --sin_disolvente
+                Genera la estructura de la aleación sólo con el soluto
+
+        -g --sin_soluto
+                Genera la estructura de la aleación sólo con el disolvente
+
+        -k --densidad
+                La densidad deseada de la aleación, esta opción elimina los
+                parametros de red
+
+    """
+
+
+    print texto
+
+##------------------------------------------------------------------------------
+masas_atomicas = {
+    'H' :   1.0079, 'He':   4.0026, 'Li':   6.9410, 'Be':   9.0122,
+    'B' :  10.8110, 'C' :  12.0107, 'N' :  14.0067, 'O' :  15.9994,
+    'F' :  18.9984, 'Ne':  20.1797, 'Na':  22.9898, 'Mg':  24.305 ,
+    'Al':  26.9815, 'Si':  28.0855, 'P' :  30.9738, 'S' :  32.065 ,
+    'Cl':  35.453 , 'Ar':  39.948 , 'K' :  39.0983, 'Ca':  40.078 ,
+    'Sc':  44.9559, 'Ti':  47.867 , 'V' :  50.9415, 'Cr':  51.9961,
+    'Mn':  54.9381, 'Fe':  55.845 , 'Co':  58.93332,'Ni':  58.6934,
+    'Cu':  63.546 , 'Zn':  65.409 , 'Ga':  69.723 , 'Ge':  72.64  ,
+    'As':  74.9216, 'Se':  78.96  , 'Br':  79.904 , 'Kr':  83.798 ,
+    'Rb':  85.4678, 'Sr':  87.62  , 'Y' :  88.9059, 'Zr':  91.224 ,
+    'Nb':  92.9064, 'Mo':  95.94  , 'Tc':  98     , 'Ru': 101.07  ,
+    'Rh': 102.9055, 'Pd': 106.42  , 'Ag': 107.8682, 'Cd': 112.411 ,
+    'In': 114.818 , 'Sn': 118.71  , 'Sb': 121.76  , 'Te': 127.6   ,
+    'I' : 126.9045, 'Xe': 131.293 , 'Cs': 132.9055, 'Ba': 137.327 ,
+    'La': 138.9055, 'Ce': 140.116 , 'Pr': 140.9077, 'Nd': 144.242 ,
+    'Pm': 145.    , 'Sm': 150.36  , 'Eu': 151.964 , 'Gd': 157.25  ,
+    'Tb': 158.9254, 'Dy': 162.5   , 'Ho': 164.9303, 'Er': 167.259 ,
+    'Tm': 168.9342, 'Yb': 173.04  , 'Lu': 174.967 , 'Hf': 178.49  ,
+    'Ta': 180.9479, 'W' : 183.84  , 'Re': 186.207 , 'Os': 190.23  ,
+    'Ir': 192.217 , 'Pt': 195.084 , 'Au': 196.9666, 'Hg': 200.59  ,
+    'Tl': 204.3833, 'Pb': 207.2   , 'Bi': 208.9804, 'Po': 209.    ,
+    'At': 210.    , 'Rn': 222.    , 'Fr': 223.    , 'Ra': 226.    ,
+    'Ac': 227.    , 'Th': 232.0381, 'Pa': 231.0359, 'U' : 238.0289,
+    'Np': 237.    , 'Pu': 244.    , 'Am': 243.    , 'Cm': 247.    ,
+    'Bk': 247.    , 'Cf': 251.    , 'Es': 252.    , 'Fm': 257.    ,
+    'Md': 258.    , 'No': 259.    , 'Lr': 262.    , 'Rf': 261.    ,
+    'Db': 262.    , 'Sg': 266.    }
+
+
+def num_atomos_sistema( multiplicador, sistema='fcc'):
+
+    if   sistema == 'fcc':
+        atomos_celda = 4
+    elif sistema == 'bcc':
+        atomos_celda = 2
+    elif sistema == 'diamante':
+        atomos_celda = 8
+    elif sistema == 'sc':
+        atomos_celda = 1
+    elif sistema == 'grafito':
+        atomos_celda = 4
+    else:
+        print "no implementado"
+        atomos_celda = 0
+        sys.exit(1)
+
+
+    return int(atomos_celda * multiplicador)
+
+##------------------------------------------------------------------------------
+def num_atomos_concentracion(num_total, fraccion):
+    numero = int(round(num_total * fraccion))
+    fraccion = 1.*numero/num_total
+    return numero, fraccion
+
+##------------------------------------------------------------------------------
+def calcula_arista(densidad, soluto, disolvente, atomos_s, atomos_d, \
+                   s_disolvente=False, s_soluto=False):
+
+    m_disolvente = masas_atomicas[disolvente] #g/mol Cu
+    m_soluto     = masas_atomicas[soluto] #g/mol Zr
+    NA=6.022e23 #mol^-1
+    #densidad #g/cm^3
+
+    #Cu64Zr36
+    m = m_disolvente*atomos_d + m_soluto*atomos_s #g.atomos/mol
+
+    if s_disolvente:
+        m = m_soluto*atomos_s #g.atomos/mol
+    elif s_soluto:
+        m = m_disolvente*atomos_d #g.atomos/mol
+
+
+    m /= NA  #g
+
+    L = m / densidad #cm^3
+    L = L**(1./3)
+    L *= 1.e8
+    return L
+
+##------------------------------------------------------------------------------
+def calcula_densidad(soluto, disolvente, atomos_s, atomos_d, volumen,\
+                     s_disolvente=False, s_soluto=False):
+
+    m_disolvente = masas_atomicas[disolvente] #g/mol
+    m_soluto     = masas_atomicas[soluto] #g/mol
+    NA=6.022e23 #mol^-1
+    m = m_disolvente*atomos_d + m_soluto*atomos_s #g.atomos/mol
+
+    if s_disolvente:
+        m = m_soluto*atomos_s #g.atomos/mol
+    elif s_soluto:
+        m = m_disolvente*atomos_d #g.atomos/mol
+
+
+    m /= NA  #g
+    return m/volumen
+
+
+
+##------------------------------------------------------------------------------
+def vector_translacion(sistema):
+
+    if sistema=='fcc':
+        return [[ 0.0,  0.0,  0.0],
+                [ 0.0,  0.5,  0.5],
+                [ 0.5,  0.0,  0.5],
+                [ 0.5,  0.5,  0.0]
+                ]
+    elif sistema == 'bcc':
+        return [[ 0.0,  0.0,  0.0 ],
+                [ 0.5,  0.5,  0.5 ]
+                ]
+    elif sistema == 'romboedral':
+        return [[ 0.0  ,  0.   ,  0.0  ],
+                [ 2./3.,  1./3.,  1./3.],
+                [-1./3.,  1./3.,  1./3.],
+                [-1./3., -2./3.,  1./3.]
+                ]
+    elif sistema == 'base_centrada':
+        return [[ 0.0  ,  0.   ,  0.0  ],
+                [ 1./2.,  1./2.,  0.0  ]
+                ]
+    elif sistema == 'diamante':
+        return [[ 0.0  ,  0.0  ,  0.0  ],
+                [ 0.0  ,  0.5  ,  0.5  ],
+                [ 0.5  ,  0.0  ,  0.5  ],
+                [ 0.5  ,  0.5  ,  0.0  ],
+                [ 1./4.,  1./4.,  1./4.],
+                [ 1./4.,  3./4.,  3./4.],
+                [ 3./4.,  1./4.,  3./4.],
+                [ 3./4.,  3./4.,  1./4.]
+                ]
+    elif sistema=='grafito':
+        return [[ 0.0  ,  0.0  ,  0.25],
+                [ 0.0  ,  0.0  ,  0.75],
+                [ 1./3.,  2./3.,  0.25],
+                [ 2./3.,  1./3.,  0.75]
+                ]
+    elif sistema == 'sc':
+        return [[0., 0., 0.]]
+    else:
+        print 'Sistema cristalino no registrado'
+        sys.exit(1)
+##------------------------------------------------------------------------------
+def vector_abc(a, b, c, alfa, beta, gama):
+    alfa *= deg2rad
+    beta *= deg2rad
+    gama *= deg2rad
+    v_a = array([a, 0, 0])
+    v_b = array([b*cos(gama), b*sin(gama), 0])
+    v_c = array([c*cos(beta),
+                c*cos(alfa)*sin(gama),
+                c*sin(acos(sqrt(
+                    cos(beta)**2 +
+                    cos(alfa)**2 *
+                    sin(gama)**2)
+                    ) ) ])
+
+    return v_a, v_b, v_c
+
+##------------------------------------------------------------------------------
+class Crea_car:
+    def __init__(self, nombre_archivo, abc, angulos):
+        cabecera =  "!BIOSYM archive 3\nPBC=ON\n"
+        cabecera += "aleaciones, Ulises Santiago <ulises_osa yahoo.com.mx>"
+        cabecera += "\n!DATE "
+        cabecera += time.ctime()
+        cabecera += "\nPBC "
+
+        for i in abc:
+            cabecera += "%9.4f "%i
+
+        for i in angulos:
+            cabecera += "%9.4f "%i
+
+        cabecera += "(P1)\n"
+
+        self.__archivo_car = open(nombre_archivo + ".car", 'w')
+        self.__archivo_car.write(cabecera)
+
+    def agrega_coordenadas(self, tipo_atomo, num, coordenadas):
+        self.__archivo_car.write('%-7s '%(tipo_atomo + str(num)))
+        self.__archivo_car.write('%12.9f   %12.9f   %12.9f '%coordenadas)
+        self.__archivo_car.write('XXXX 1      xx      %-2s  0.000\n'%tipo_atomo)
+
+    def finaliza_archivo(self):
+        self.__archivo_car.write('end\nend\n')
+        self.__archivo_car.close()
+
+##------------------------------------------------------------------------------
+class Crea_xyz:
+    def __init__(self, nombre_archivo):
+        cabecera = " "*50
+        cabecera += "\n" + nombre_archivo + "\n"
+        self.__archivo_car = open(nombre_archivo + ".xyz", 'w')
+        self.__archivo_car.write(cabecera)
+        self.__nombre_archivo = nombre_archivo + ".xyz"
+        self.__cont = 0
+
+    def agrega_coordenadas(self, tipo_atomo, coordenadas):
+        self.__cont += 1
+        self.__archivo_car.write('%-7s '%(tipo_atomo))
+        self.__archivo_car.write('%12.9f   %12.9f   %12.9f\n'%coordenadas)
+
+    def finaliza_archivo(self):
+        self.__archivo_car.close()
+        self.__archivo_car = open(self.__nombre_archivo, 'r+')
+        self.__archivo_car.write('%d'%self.__cont)
+        self.__archivo_car.close()
+
+##------------------------------------------------------------------------------
+def a_vegard(x):
+    return (1-x)*4.0857 + x*4.0782
+
+##------------------------------------------------------------------------------
+def main():
+
+    ## fcc
+    sistema_base            = 'fcc'
+    sistema_cristalino      = array(vector_translacion(sistema_base))
+    #parametro_de_red        = 4.0857                     ## angstroms
+    #parametro_de_red_b      = 4.0857                     ## angstroms
+    #parametro_de_red_c      = 4.0857                     ## angstroms
+
+    nombre_sistema          = 'AgAu'
+    veces_la_arista_n       = 3                          ## veces parámetro de red
+    veces_la_arista_l       = None                       ## veces parámetro de red
+    veces_la_arista_m       = None                          ## veces parámetro de red
+    disolvente              = 'Ag'
+    soluto                  = 'Au'
+    concentracion           = 0.20
+    parametro_de_red_a      = 4.0857 # a_vegard(concentracion)
+    sin_soluto              = False
+    sin_disolvente          = False
+    con_densidad            = False
+
+    densidad                = 0.0
+
+    ### argumento, ver documentación del módulo 'getopt'
+    try:
+        opciones, argumentos = getopt.getopt(sys.argv[1:], \
+            "hfga:b:c:n:l:m:o:x:s:d:e:k:", ["help", "sin_soluto", "sin_disolvente",
+                          "parametro_de_red_a=", "parametro_de_red_b=", \
+                          "parametro_de_red_c=", "veces_la_arista_n=", \
+                          "veces_la_arista_l=", "veces_la_arista_m=",\
+                          "output=", "concentracion=", "sistema_base=",\
+                          "disolvente=", "soluto=", "densidad="])
+    except getopt.error, msg:
+        print msg
+        print "Para ayuda use --help"
+        sys.exit(2)
+
+    ## si se elije la opción de ayuda
+    for (opcion, valor) in opciones:
+        if opcion in ("-h", "--help"):
+            uso(sys.argv[0])
+            sys.exit(0)
+
+################################################################################
+
+    ## procesamiento de opciones
+    for (opcion, valor) in opciones:
+        if  opcion in ("-a", "--parametro_de_red_a"):
+            parametro_de_red_a = float(valor)
+
+        elif opcion in ("-b", "--parametro_de_red_b"):
+            parametro_de_red_b = float(valor)
+
+        elif opcion in ("-c", "--parametro_de_red_c"):
+            parametro_de_red_c = float(valor)
+
+        elif opcion in ("-n", "--veces_la_arista_n"):
+            veces_la_arista_n = float(valor)
+
+        elif opcion in ("-l", "--veces_la_arista_l"):
+            veces_la_arista_l = float(valor)
+
+        elif opcion in ("-m", "--veces_la_arista_m"):
+            veces_la_arista_m = float(valor)
+
+        elif opcion in ("-o", "--output"):
+            nombre_sistema = valor
+
+        elif opcion in ("-s", "--sistema_base"):
+            sistema_base = valor
+            sistema_cristalino = array(vector_translacion(valor))
+
+        elif opcion in ("-x", "--concentracion"):
+            concentracion    = float(valor)
+            #parametro_de_red = a_vegard(concentracion)
+
+        elif opcion in ("-d", "--disolvente"):
+            disolvente = valor
+
+        elif opcion in ("-e", "--soluto"):
+            soluto = valor
+
+        elif opcion in ("-f", "--sin_disolvente"):
+            sin_disolvente = True
+
+        elif opcion in ("-g", "--sin_soluto"):
+            sin_soluto = True
+
+        elif opcion in ("-k", "--densidad"):
+            con_densidad=True
+            densidad = float(valor)
+        else:
+            assert False, "Opcion inmanejable: " + opcion
+
+
+    if veces_la_arista_l == None:
+        veces_la_arista_l =veces_la_arista_n
+    if veces_la_arista_m == None:
+        veces_la_arista_m = veces_la_arista_n
+
+
+    num_atomos_total = num_atomos_sistema(ceil(veces_la_arista_n)* \
+                                        ceil(veces_la_arista_l)* \
+                                        ceil(veces_la_arista_m), sistema_base)
+
+    num_solutos, fraccion = num_atomos_concentracion(num_atomos_total, concentracion)
+
+    if con_densidad:
+        superarista = calcula_arista(densidad, soluto, disolvente, \
+                                            num_solutos, num_atomos_total -\
+                                            num_solutos)
+
+        parametro_de_red_a = superarista / ceil(veces_la_arista_n)
+        parametro_de_red_b = superarista / ceil(veces_la_arista_l)
+        parametro_de_red_c = superarista / ceil(veces_la_arista_m)
+
+
+
+    if sistema_base != 'grafito':
+        v_a, v_b, v_c = vector_abc(1., 1., 1., 90, 90, 90)
+        parametro_de_red_c = parametro_de_red_b= parametro_de_red_a
+        archivocar = Crea_car(nombre_sistema,\
+                       (parametro_de_red_a*ceil(veces_la_arista_n),\
+                        parametro_de_red_a*ceil(veces_la_arista_n),\
+                        parametro_de_red_a*ceil(veces_la_arista_n)),\
+                        (90, 90, 90))
+    else:
+        v_a, v_b, v_c = vector_abc(1., 1., 1., 90, 90, 120)
+        parametro_de_red_b = parametro_de_red_a
+        archivocar = Crea_car(nombre_sistema,\
+                          (parametro_de_red_a*ceil(veces_la_arista_n),\
+                           parametro_de_red_b*ceil(veces_la_arista_l),\
+                           parametro_de_red_c*ceil(veces_la_arista_m)),\
+                          (90, 90, 120))
+
+
+
+
+
+    archivoxyz = Crea_xyz(nombre_sistema)
+
+
+
+    solutos = []
+    for i in range(num_solutos):
+        while 1:
+            aleatorio = random.randint(0, num_atomos_total-1)
+
+            if aleatorio not in solutos:
+                solutos += [aleatorio]
+                break
+
+    a_total      = 0
+    a_soluto     = 0
+    a_disolvente = 0
+    frac         = 0.0
+
+    for x in arange(veces_la_arista_n):
+        for y in arange(veces_la_arista_l):
+            for z in arange(veces_la_arista_m):
+                for i in sistema_cristalino:
+                    ## hace que los átomos se encuentre dentro de la súper celda
+                    ## y no más allá debido a los vectores de translación
+
+                    vec = v_a*(x+i[0]-frac + 2*frac*random.random()) \
+                        + v_b*(y+i[1]-frac + 2*frac*random.random()) \
+                        + v_c*(z+i[2]-frac + 2*frac*random.random())
+
+                    if ((vec[0] >= veces_la_arista_n) or
+                        (vec[1] >= veces_la_arista_l) or
+                        (vec[2] >= veces_la_arista_m)):
+                        continue
+
+                    vec *= array([parametro_de_red_a, parametro_de_red_b, parametro_de_red_c])
+
+                    if a_total not in solutos:
+                        a_disolvente += 1
+                        if not sin_disolvente:
+                            archivocar.agrega_coordenadas(disolvente, a_disolvente, (vec[0], vec[1], vec[2]))
+                            archivoxyz.agrega_coordenadas(disolvente, (vec[0], vec[1], vec[2]))
+
+                    else:
+                        a_soluto += 1
+                        if not sin_soluto:
+                            archivocar.agrega_coordenadas(soluto, a_soluto, (vec[0], vec[1], vec[2]))
+                            archivoxyz.agrega_coordenadas(soluto, (vec[0], vec[1], vec[2]))
+
+                    a_total += 1
+
+    print "Nombre del sistema       : %s"%nombre_sistema
+    print "Sistema base             : %s"%sistema_base
+    print "Atomos totales           : %d (%d)"%(a_total, num_atomos_total)
+    print "Atomos disolvente (%2s)   : %d (%d)"%(disolvente, a_disolvente, num_atomos_total-num_solutos)
+    print "Atomos soluto     (%2s)   : %d (%d)"%(soluto, a_soluto, num_solutos)
+    print "Concentracion real       : %f (%f)"%(a_soluto/a_total, fraccion)
+    print "Veces celda unitaria a   : %f"%ceil(veces_la_arista_n)
+    print "Veces celda unitaria b   : %f"%ceil(veces_la_arista_l)
+    print "Veces celda unitaria c   : %f"%ceil(veces_la_arista_m)
+    print "Parametro de red a       : %f A"%parametro_de_red_a
+    print "Parametro de red b       : %f A"%parametro_de_red_b
+    print "Parametro de red c       : %f A"%parametro_de_red_c
+    print "parametro de supercelda a: %f A"%(parametro_de_red_a*veces_la_arista_n)
+    print "parametro de supercelda b: %f A"%(parametro_de_red_b*veces_la_arista_l)
+    print "parametro de supercelda c: %f A"%(parametro_de_red_c*veces_la_arista_m)
+    print "densidad                 : %f gcm^-1"%calcula_densidad(soluto, disolvente, \
+                                                   num_solutos, \
+                                                   num_atomos_total-num_solutos,\
+                                                   ((parametro_de_red_a*veces_la_arista_n*\
+                                                    parametro_de_red_b*veces_la_arista_l*\
+                                                    parametro_de_red_c*veces_la_arista_m)*1e-24),\
+                                                    sin_disolvente, \
+                                                    sin_soluto)
+
+
+    archivocar.finaliza_archivo()
+    archivoxyz.finaliza_archivo()
+
+
+if __name__ == "__main__":
+    main()
+
+#tel
+#0445537164487
