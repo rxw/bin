@@ -10,7 +10,6 @@ yellow="#ffFFFF48"
 
 clock() {
   hour=$(date '+%I:%M')
-<<<<<<< HEAD
   echo "%{F${red}}%{F-} $hour"
 }
 
@@ -28,14 +27,7 @@ volume() {
     disp="${disp}%{F#ff7f7f7f}:%{F-}"
   done
   echo "%{F${yellow}}%{F-} $disp"
-=======
   echo " $hour"
-}
-
-volume() {
-  vol=$(amixer get Master | sed -n 'N;s/^.*\[\([0-9]\+%\).*$/\1/p')
-  echo " $vol"
->>>>>>> 5fcad8631dc28222ea4afdd4b624b35531d9519e
 }
 
 #$cpuload() {
