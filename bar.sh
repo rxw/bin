@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 FONT='-*-gohufont-medium-*-*-*-11-*-*-*-*-*-*-*'
 FALLBACK='-*-stlarch-medium-*-*-*-10-*-*-*-*-*-*-*'
 BGCOLOR="#FF1f1f1f"
