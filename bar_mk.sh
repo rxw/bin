@@ -60,14 +60,11 @@ volume() {
 groups() {
   cur=`xprop -root _NET_CURRENT_DESKTOP | awk '{print $3}'`
   echo "%{F${blue}}%{F-} $cur"
-  echo "$cur"
 }
 
 nowplaying() {
     cur=`mpc current`
     echo "%{F${blue}}%{F-} $cur"
-    # this line allow to choose whether the output will scroll or not
-    echo " $cur"
 }
 
 battery() {
@@ -103,7 +100,7 @@ while :; do
    # buf="${buf} %{c}$(windows)"
    # buf="${buf} %{r} %{B#FFfafafa}%{F#FF37393d} $(volume)  "
     buf="${buf} %{r} $(nowplaying) "
-   # buf="${buf}  $(battery)% "
+    buf="${buf}  $(battery)% "
     buf="${buf}  $(clock) "
     buf="${buf}  %{r} %{B-}%{F-}"
 
