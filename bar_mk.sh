@@ -2,18 +2,31 @@
 #
 # z3bra - (c) wtfpl 2014
 # Fetch infos on your computer, and print them to stdout every second.
-#### Vars
-
+### Vars
+red="#FFFF4D49"
+blue="#ff4AD8FF"
+yellow="#ffFFFF48"
 ### Functions
 
 clock() {
   hour=$(date '+%I:%M')
-  echo " $hour"
+  echo "%{F${red}}%{F-} $hour"
 }
 
 volume() {
-  vol=$(amixer get Master | sed -n 'N;s/^.*\[\([0-9]\+%\).*$/\1/p')
-  echo "☎ $vol"
+  vol=$(amixer get Master | sed -n 'N;s/^.*\[\([0-9]\+%\).*$/\1/p' | tr -d %)
+  rvol=$(( vol / 5 ))
+  nvol=$(( 20 - rvol ))
+  disp=""
+  for((i=0; i < rvol; i++))
+  do
+    disp="${disp}%{F#FFffFFff}:%{F-}"
+  done
+  for((i=0; i < nvol; i++))
+  do
+    disp="${disp}%{F#ff7f7f7f}:%{F-}"
+  done
+  echo "%{F${yellow}}%{F-} $disp"
 }
 
 #$cpuload() {
@@ -45,14 +58,12 @@ volume() {
 
 groups() {
   cur=`xprop -root _NET_CURRENT_DESKTOP | awk '{print $3}'`
-  
-  echo "$cur"
+  echo "%{F${blue}}%{F-} $cur"
 }
 
 nowplaying() {
     cur=`mpc current`
-    # this line allow to choose whether the output will scroll or not
-    echo "$cur"
+    echo "%{F${blue}}%{F-} $cur"
 }
 
 battery() {
@@ -62,7 +73,8 @@ battery() {
   BATS=/sys/class/power_supply/$BATN/status
 
   # prepend percentage with a '+' if charging, '-' otherwise
-  test "`cat $BATS`" = "Charging" && echo -n '⚡ ' || echo -n " "
+  test "`cat $BATS`" = "Charging" && echo -n '%{F${yellow}}%{F-} ' \
+    || echo -n "%{F${yellow}}%{F-} "
   # print out the content
   sed -n p $BATC
 }
@@ -80,11 +92,11 @@ battery() {
 while :; do
     buf=""
     buf="%{l} $(groups) "
+    buf="${buf} $(volume) "
    # buf="${buf} network: $(network) | "
    # buf="${buf} CPU: $(cpuload)%% -"
    # buf="${buf} RAM: $(memused)%% -"
    # buf="${buf} %{c}$(windows)"
-   # buf="${buf} %{r} %{B#FFfafafa}%{F#FF37393d} $(volume)  "
     buf="${buf} %{r} $(nowplaying) "
     buf="${buf}  $(battery)% "
     buf="${buf}  $(clock) "
