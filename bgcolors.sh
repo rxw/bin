@@ -35,9 +35,9 @@ printf "\n*background:#%s" $background >> /home/$USER/.Xdefaults
 printf "\n*foreground:#%s" $foreground >> /home/$USER/.Xdefaults
 rm /home/$USER/.colors
 printf "#!/bin/bash\n" >> /home/$USER/.colors
-printf "BACKGROUND %s\n" $background >> /home/$USER/.colors
-printf "FOREGROUND %s\n" $foreground >> /home/$USER/.colors
-printf "NEUTRAL %s\n" $neutral >> /home/$USER/.colors
+printf "BACKGROUND #FF%s\n" $background >> /home/$USER/.colors
+printf "FOREGROUND #FF%s\n" $foreground >> /home/$USER/.colors
+printf "NEUTRAL #FF%s\n" $neutral >> /home/$USER/.colors
 chmod +x /home/$USER/.colors
 
 feh --bg-fill $image
