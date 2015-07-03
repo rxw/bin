@@ -7,7 +7,6 @@ if [ $(echo $1 | tail -c 4)="png" ]
 then
   image="${name}.png"
   convert $1 $image
-  rm $1
 fi
 
 mv /home/$USER/.Xdefaults /home/$USER/.Xdefaults.bak
