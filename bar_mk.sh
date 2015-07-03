@@ -3,14 +3,12 @@
 # z3bra - (c) wtfpl 2014
 # Fetch infos on your computer, and print them to stdout every second.
 ### Vars
-red="#FFFF4D49"
-blue="#ff4AD8FF"
-yellow="#ffFFFF48"
+NEUTRAL=$1
 ### Functions
 
 clock() {
   hour=$(date '+%I:%M')
-  echo "%{F${red}}%{F-} $hour"
+  echo " $hour"
 }
 
 volume() {
@@ -20,14 +18,14 @@ volume() {
   disp=""
   for((i=0; i < rvol; i++))
   do
-    disp="${disp}%{F#FFffFFff}:%{F-}"
+    disp="${disp}%{F#FFffFFff}=%{F-}"
   done
+    disp="${disp}%{F#FFffFFff}o%{F-}"
   for((i=0; i < nvol; i++))
   do
-    disp="${disp}%{F#ff7f7f7f}:%{F-}"
+    disp="${disp}%{F#ff7f7f7f}-%{F-}"
   done
-  echo "%{F${yellow}}%{F-} $disp"
-  echo " $hour"
+  echo "%{F${NEUTRAL}}VOL%{F-} $disp"
 }
 
 #$cpuload() {
@@ -59,12 +57,12 @@ volume() {
 
 groups() {
   cur=`xprop -root _NET_CURRENT_DESKTOP | awk '{print $3}'`
-  echo "%{F${blue}}%{F-} $cur"
+  echo "%{F${NEUTRAL}}DSKTP%{F-} $cur"
 }
 
 nowplaying() {
     cur=`mpc current`
-    echo "%{F${blue}}%{F-} $cur"
+    echo "%{F${NEUTRAL}}PLAYING%{F-} $cur"
 }
 
 battery() {
@@ -74,8 +72,8 @@ battery() {
   BATS=/sys/class/power_supply/$BATN/status
 
   # prepend percentage with a '+' if charging, '-' otherwise
-  test "`cat $BATS`" = "Charging" && echo -n "%{F${yellow}}%{F-} " \
-    || echo -n "%{F${yellow}}%{F-} "
+  test "`cat $BATS`" = "Charging" && echo -n "%{F${NEUTRAL}}CHRGNG%{F-} " \
+    || echo -n "%{F${NEUTRAL}}BTTRY%{F-} "
   # print out the content
   sed -n p $BATC
 }
