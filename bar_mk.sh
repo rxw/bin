@@ -74,7 +74,7 @@ battery() {
   BATS=/sys/class/power_supply/$BATN/status
 
   # prepend percentage with a '+' if charging, '-' otherwise
-  test "`cat $BATS`" = "Charging" && echo -n "%{F${yellow}}%{F-} " \
+  test "`cat $BATS`" = "Charging" && echo -n "%{F${yellow}}%{F-} " \
     || echo -n "%{F${yellow}}%{F-} "
   # print out the content
   sed -n p $BATC
