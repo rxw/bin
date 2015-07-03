@@ -18,9 +18,9 @@ volume() {
   disp=""
   for((i=0; i < rvol; i++))
   do
-    disp="${disp}%{F#FFffFFff}=%{F-}"
+    disp="${disp}%{F#FFffFFff}-%{F-}"
   done
-    disp="${disp}%{F#FFffFFff}o%{F-}"
+    disp="${disp}%{F#FFffFFff}+%{F-}"
   for((i=0; i < nvol; i++))
   do
     disp="${disp}%{F#ff7f7f7f}-%{F-}"
