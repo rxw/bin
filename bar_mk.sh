@@ -90,8 +90,8 @@ battery() {
 # This loop will fill a buffer with our infos, and output it to stdout.
 while :; do
     buf=""
-    buf="%{l} $(groups) "
-    buf="${buf} $(volume) "
+   # buf="%{l} $(groups) "
+    buf="%{l}${buf} $(volume) "
    # buf="${buf} network: $(network) | "
    # buf="${buf} CPU: $(cpuload)%% -"
    # buf="${buf} RAM: $(memused)%% -"
