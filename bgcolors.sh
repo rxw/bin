@@ -1,9 +1,18 @@
 #!/bin/bash
+# Author: tato
+# Gets a picture and generates a terminal colorscheme
+# prints it to stdout, creates a file called .colors
+# in your home directory with fg, bg, and neutral colors.
 
 folder=$(dirname $1)
 name=$(echo $1 | awk -F. '{ print $1 }')
 image=$1
 
+# Set as background
+feh --bg-fill $image
+cp $image "$folder/wp.png"
+
+# Generate colorscheme
 cont=0
 for i in $(colors -en 16 $image )
 do
@@ -28,6 +37,3 @@ rm /home/$USER/.colors
 printf "BACKGROUND #FF%s\n" $background >> /home/$USER/.colors
 printf "FOREGROUND #FF%s\n" $foreground >> /home/$USER/.colors
 printf "NEUTRAL #FF%s\n" $neutral >> /home/$USER/.colors
-
-feh --bg-fill $image
-cp $image "$folder/wp.png"
