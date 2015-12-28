@@ -20,12 +20,12 @@ volume() {
   do
     disp="${disp}%{F#FFffFFff}-%{F-}"
   done
-    disp="${disp}%{F#FFffFFff}+%{F-}"
+  disp="${disp}$"
   for((i=0; i < nvol; i++))
   do
     disp="${disp}%{F#ff7f7f7f}-%{F-}"
   done
-  echo "%{F${NEUTRAL}}VOL%{F-} $disp"
+  echo "%{F${NEUTRAL}}vol%{F-} $disp"
 }
 
 #$cpuload() {
@@ -55,6 +55,14 @@ volume() {
 #        echo "$int  connected" || echo "$int  disconnected"
 #}
 
+wifi() {
+  initial=$(iwconfig | grep -o '[0-9]\{2\}/70')
+  percentage=$(echo ${initial}*100 | bc -l)
+  strength=$( echo ${percentage}/1 | bc)
+  name=$(iwconfig | grep -o '"[a-z]*"' | tr -d \")
+  echo "%{F${NEUTRAL}}wifi%{F-} ${name} ${strength}%%"
+}
+
 groups() {
   cur=`xprop -root _NET_CURRENT_DESKTOP | awk '{print $3}'`
   echo "%{F${NEUTRAL}}DSKTP%{F-} $cur"
@@ -62,7 +70,7 @@ groups() {
 
 nowplaying() {
     cur=`mpc current`
-    echo "%{F${NEUTRAL}}PLAYING%{F-} $cur"
+    echo "%{F${NEUTRAL}}playing%{F-} $cur"
 }
 
 battery() {
@@ -73,7 +81,7 @@ battery() {
 
   # prepend percentage with a '+' if charging, '-' otherwise
   test "`cat $BATS`" = "Charging" && echo -n "%{F${NEUTRAL}}CHRGNG%{F-} " \
-    || echo -n "%{F${NEUTRAL}}BTTRY%{F-} "
+    || echo -n "%{F${NEUTRAL}}bat%{F-} "
   # print out the content
   sed -n p $BATC
 }
@@ -98,7 +106,8 @@ while :; do
    # buf="${buf} %{c}$(windows)"
    # buf="${buf} %{r} %{B#FFfafafa}%{F#FF37393d} $(volume)  "
     buf="${buf} %{r} $(nowplaying) "
-    buf="${buf}  $(battery)% "
+    buf="${buf}  $(battery)%% "
+    buf="${buf} $(wifi) "
     buf="${buf}  $(clock) "
     buf="${buf}  %{r} %{B-}%{F-}"
 
