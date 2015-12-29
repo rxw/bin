@@ -1,0 +1,8 @@
+#!/bin/sh
+IMG=$(readlink -f $1)
+CPT=0
+colors -n16 $IMG | while read HEXCODE; do
+        printf '*color%d: %s\n' "$CPT" "$HEXCODE"
+        CPT=$(expr $CPT + 1)
+done | xrdb -merge
+feh --bg-fill $IMG
