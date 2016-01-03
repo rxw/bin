@@ -18,12 +18,12 @@ volume() {
   disp=""
   for((i=0; i < rvol; i++))
   do
-    disp="${disp}%{F#FFffFFff}-%{F-}"
+    disp="${disp}%{F#FFffFFff}─%{F-}"
   done
-  disp="${disp}$"
+  disp="${disp}»"
   for((i=0; i < nvol; i++))
   do
-    disp="${disp}%{F#ff7f7f7f}-%{F-}"
+    disp="${disp}%{F#ff7f7f7f}─%{F-}"
   done
   echo "%{F${NEUTRAL}}vol%{F-} $disp"
 }
@@ -38,22 +38,6 @@ volume() {
 #    bc <<< "scale=2; 100 - $f / $t * 100" | cut -d. -f1
 #}
 
-#network() {
-#    read lo int1 int2 <<< `ip link | sed -n 's/^[0-9]: \(.*\):.*$/\1/p'`
-#    if iwconfig $int1 >/dev/null 2>&1; then
-#        wifi=$int1
-#        eth0=$int2
-#    else
-#        wifi=$int2
-#        eth0=$int1
-#    fi
-#    ip link show $eth0 | grep 'state UP' >/dev/null && int=$eth0 ||int=$wifi
-#
-#    #int=eth0
-#
-#    ping -c 1 8.8.8.8 >/dev/null 2>&1 &&
-#        echo "$int  connected" || echo "$int  disconnected"
-#}
 
 #groups() {
 #  cur=`xprop -root _NET_CURRENT_DESKTOP | awk '{print $3}'`
@@ -85,13 +69,13 @@ nowplaying() {
 #  sed -n p $BATC
 #}
 
-wifi() {
-  initial=$(iwconfig | grep -o '[0-9]\{2\}/70')
-  percentage=$(echo ${initial}*100 | bc -l)
-  strength=$( echo ${percentage}/1 | bc)
-  name=$(iwconfig | grep -o '"[a-z]*"' | tr -d \")
-  echo "%{F${NEUTRAL}}wifi%{F-} ${name} ${strength}%%"
-}
+#wifi() {
+#  initial=$(iwconfig | grep -o '[0-9]\{2\}/70')
+#  percentage=$(echo ${initial}*100 | bc -l)
+#  strength=$( echo ${percentage}/1 | bc)
+#  name=$(iwconfig | egrep -o '".*"' | tr -d \")
+#  echo "%{F${NEUTRAL}}wifi%{F-} ${name} ${strength}%%"
+#}
 
 groups() {
   cur=`xprop -root _NET_CURRENT_DESKTOP | awk '{print $3}'`
@@ -110,7 +94,7 @@ battery() {
   BATS=/sys/class/power_supply/$BATN/status
 
   # prepend percentage with a '+' if charging, '-' otherwise
-  test "`cat $BATS`" = "Charging" && echo -n "%{F${NEUTRAL}}CHRGNG%{F-} " \
+  test "`cat $BATS`" = "Charging" && echo -n "%{F${NEUTRAL}}chrgng%{F-} " \
     || echo -n "%{F${NEUTRAL}}bat%{F-} "
   # print out the content
   sed -n p $BATC
@@ -140,8 +124,7 @@ while :; do
     buf="${buf} %{r} $(clock) "
     buf="${buf} %{r} "
     buf="${buf} %{r} $(nowplaying) "
-   # buf="${buf}  $(battery)%% "
-   # buf="${buf} $(wifi) "
+    buf="${buf}  $(battery)%% "
     buf="${buf}  $(clock) "
     buf="${buf}  %{r} %{B-}%{F-}"
 
