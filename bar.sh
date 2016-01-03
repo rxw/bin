@@ -1,9 +1,7 @@
-FONT="Monaco for Powerline-9"
-FALLBACK="FontAwesome-11"
 BGCOLOR="#FF1f1f1f"
 FGCOLOR="#FFcacaca"
 
-./bin/bar_mk.sh | lemonbar -p -g 1520x22+200+0 -f 'Monaco for Powerline-9','FontAwesome-11' -B${BGCOLOR} -F${FGCOLOR} | while read -r line; do
+./bin/bar_mk.sh | bar -p -g 1520x20+200+0 -f '-*-tewi-medium-*-*-*-11-*-*-*-*-*-*-*','-*-stlarch-medium-*-*-*-10-*-*-*-*-*-*-*' -B${BGCOLOR} -F${FGCOLOR} | while read -r line; do
   $line
 done
 

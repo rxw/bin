@@ -8,13 +8,13 @@
 
 clock() {
   hour=$(date '+%I:%M')
-  echo " $hour"
+  echo "$hour"
 }
 
-volume() {
-  vol=$(amixer get Master | sed -n 'N;s/^.*\[\([0-9]\+%\).*$/\1/p')
-  echo " $vol"
-}
+#volume() {
+#  vol=$(amixer get Master | sed -n 'N;s/^.*\[\([0-9]\+%\).*$/\1/p')
+#  echo " $vol"
+#}
 
 #$cpuload() {
 #$    LINE=`ps -eo pcpu |grep -vE '^\s*(0.0|%CPU)' |sed -n '1h;$!H;$g;s/\n/ +/gp'`
@@ -43,35 +43,35 @@ volume() {
 #        echo "$int  connected" || echo "$int  disconnected"
 #}
 
-groups() {
-  cur=`xprop -root _NET_CURRENT_DESKTOP | awk '{print $3}'`
-  echo "$cur"
-}
+#groups() {
+#  cur=`xprop -root _NET_CURRENT_DESKTOP | awk '{print $3}'`
+#  echo "$cur"
+#}
 
 nowplaying() {
     cur=`mpc current`
     # this line allow to choose whether the output will scroll or not
-    echo " $cur"
+    echo " $cur"
 }
 
-battery() {
-  BATN=$(ls /sys/class/power_supply/ | grep BAT)
-  test -z "$BATN" && exit 1
-  BATC=/sys/class/power_supply/$BATN/capacity
-  BATS=/sys/class/power_supply/$BATN/status
-  
-  tot=`cat $BATC`
-  if [ $tot -lt 50 ]; then
-    icon=""
-  else
-    icon=""
-  fi
-
-  # prepend percentage with a '+' if charging, '-' otherwise
-  test "`cat $BATS`" = "Charging" && echo -n ' ' || echo -n "$icon "
-  # print out the content
-  sed -n p $BATC
-}
+#battery() {
+#  BATN=$(ls /sys/class/power_supply/ | grep BAT)
+#  test -z "$BATN" && exit 1
+#  BATC=/sys/class/power_supply/$BATN/capacity
+#  BATS=/sys/class/power_supply/$BATN/status
+#  
+#  tot=`cat $BATC`
+#  if [ $tot -lt 50 ]; then
+#    icon=""
+#  else
+#    icon=""
+#  fi
+#
+#  # prepend percentage with a '+' if charging, '-' otherwise
+#  test "`cat $BATS`" = "Charging" && echo -n ' ' || echo -n "$icon "
+#  # print out the content
+#  sed -n p $BATC
+#}
 
 #windows() {
 #  wnd_focus=$(xdotool getwindowfocus)
@@ -85,18 +85,17 @@ battery() {
 # This loop will fill a buffer with our infos, and output it to stdout.
 while :; do
     buf=""
-    buf="%{l} $(groups) "
+   # buf="%{l} $(groups) "
    # buf="${buf} network: $(network) | "
    # buf="${buf} CPU: $(cpuload)%% -"
    # buf="${buf} RAM: $(memused)%% -"
    # buf="${buf} %{c}$(windows)"
    # buf="${buf} %{r} %{B#FFfafafa}%{F#FF37393d} $(volume)  "
-    buf="${buf} %{r} $(nowplaying) "
+    buf="${buf} %{l} $(nowplaying) "
    # buf="${buf}  $(battery)% "
-    buf="${buf}  $(clock) "
-    buf="${buf}  %{r} %{B-}%{F-}"
+    buf="${buf} %{r} $(clock) "
+    buf="${buf} %{r} "
 
     echo $buf
-    # use `nowplaying scroll` to get a scrolling output!
-    sleep 0.1 # The HUD will be updated every second
+    sleep 1 # The HUD will be updated every second
 done
