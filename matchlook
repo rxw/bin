@@ -5,4 +5,5 @@ colors -n16 $IMG | while read HEXCODE; do
         printf '*color%d: %s\n' "$CPT" "$HEXCODE"
         CPT=$(expr $CPT + 1)
 done | xrdb -merge
-feh --bg-fill $IMG
+xrdb -query colors > ~/.Xresources
+feh --bg-fill $IMG && cp $IMG $(dirname $IMG)/wp.png
