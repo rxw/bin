@@ -1,7 +1,10 @@
-BGCOLOR="#FF1f1f1f"
-FGCOLOR="#FFcacaca"
+#!/bin/bash
 
-./bin/bar_mk.sh | bar -p -g 1520x20+200+0 -f '-*-tewi-medium-*-*-*-11-*-*-*-*-*-*-*','-*-stlarch-medium-*-*-*-10-*-*-*-*-*-*-*' -B${BGCOLOR} -F${FGCOLOR} | while read -r line; do
-  $line
-done
+font="*-proggycleancp-medium-*-*-*-13-*-*-*-*-*-*-*"
+f=$(cat /home/$USER/.colors | grep FORE | awk '{print $2}')
+b=$(cat /home/$USER/.colors | grep BACK | awk '{print $2}')
+n=$(cat /home/$USER/.colors | grep NEUT | awk '{print $2}')
 
+sh ~/bin/bar_mk.sh $n | bar -p -g 1920x30+0+0 -u 3 \
+-f $font  \
+-B $b -F $f

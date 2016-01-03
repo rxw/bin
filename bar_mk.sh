@@ -2,8 +2,8 @@
 #
 # z3bra - (c) wtfpl 2014
 # Fetch infos on your computer, and print them to stdout every second.
-#### Vars
-
+### Vars
+NEUTRAL=$1
 ### Functions
 
 clock() {
@@ -11,10 +11,22 @@ clock() {
   echo "$hour"
 }
 
-#volume() {
-#  vol=$(amixer get Master | sed -n 'N;s/^.*\[\([0-9]\+%\).*$/\1/p')
-#  echo " $vol"
-#}
+volume() {
+  vol=$(amixer get Master | sed -n 'N;s/^.*\[\([0-9]\+%\).*$/\1/p' | tr -d %)
+  rvol=$(( vol / 5 ))
+  nvol=$(( 20 - rvol ))
+  disp=""
+  for((i=0; i < rvol; i++))
+  do
+    disp="${disp}%{F#FFffFFff}-%{F-}"
+  done
+  disp="${disp}$"
+  for((i=0; i < nvol; i++))
+  do
+    disp="${disp}%{F#ff7f7f7f}-%{F-}"
+  done
+  echo "%{F${NEUTRAL}}vol%{F-} $disp"
+}
 
 #$cpuload() {
 #$    LINE=`ps -eo pcpu |grep -vE '^\s*(0.0|%CPU)' |sed -n '1h;$!H;$g;s/\n/ +/gp'`
@@ -73,6 +85,37 @@ nowplaying() {
 #  sed -n p $BATC
 #}
 
+wifi() {
+  initial=$(iwconfig | grep -o '[0-9]\{2\}/70')
+  percentage=$(echo ${initial}*100 | bc -l)
+  strength=$( echo ${percentage}/1 | bc)
+  name=$(iwconfig | grep -o '"[a-z]*"' | tr -d \")
+  echo "%{F${NEUTRAL}}wifi%{F-} ${name} ${strength}%%"
+}
+
+groups() {
+  cur=`xprop -root _NET_CURRENT_DESKTOP | awk '{print $3}'`
+  echo "%{F${NEUTRAL}}DSKTP%{F-} $cur"
+}
+
+nowplaying() {
+    cur=`mpc current`
+    echo "%{F${NEUTRAL}}playing%{F-} $cur"
+}
+
+battery() {
+  BATN=$(ls /sys/class/power_supply/ | grep BAT)
+  test -z "$BATN" && exit 1
+  BATC=/sys/class/power_supply/$BATN/capacity
+  BATS=/sys/class/power_supply/$BATN/status
+
+  # prepend percentage with a '+' if charging, '-' otherwise
+  test "`cat $BATS`" = "Charging" && echo -n "%{F${NEUTRAL}}CHRGNG%{F-} " \
+    || echo -n "%{F${NEUTRAL}}bat%{F-} "
+  # print out the content
+  sed -n p $BATC
+}
+
 #windows() {
 #  wnd_focus=$(xdotool getwindowfocus)
 #  
@@ -86,6 +129,7 @@ nowplaying() {
 while :; do
     buf=""
    # buf="%{l} $(groups) "
+    buf="%{l}${buf} $(volume) "
    # buf="${buf} network: $(network) | "
    # buf="${buf} CPU: $(cpuload)%% -"
    # buf="${buf} RAM: $(memused)%% -"
@@ -95,6 +139,11 @@ while :; do
    # buf="${buf}  $(battery)% "
     buf="${buf} %{r} $(clock) "
     buf="${buf} %{r} "
+    buf="${buf} %{r} $(nowplaying) "
+   # buf="${buf}  $(battery)%% "
+   # buf="${buf} $(wifi) "
+    buf="${buf}  $(clock) "
+    buf="${buf}  %{r} %{B-}%{F-}"
 
     echo $buf
     sleep 1 # The HUD will be updated every second

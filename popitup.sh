@@ -1,20 +1,15 @@
 #!/bin/sh
 # how long should the popup remain?
 duration=3
+f=$(cat /home/$USER/.colors | grep FORE | awk '{print $2}')
+b=$(cat /home/$USER/.colors | grep BACK | awk '{print $2}')
 
-# define geometry
-barx=1650
-bary=10
-barw=233
-barh=20
+# define geometryt
+chars=$1
+totw=${#chars}
+w=$(echo ${totw}*9.7 | bc)
+h=40
+x=$(echo 1870-$w | bc)
+y=40
 
-# colors
-bar_bg="#ff353535"
-bar_fg="#ff858585" # white is default
-
-# font used
-bar_font="-*-stlarch-*-*-*-*-*-*-*-*-*-*-*"
-
-# compute all this
-baropt="-g ${barw}x${barh}+${barx}+${bary} -B${bar_bg} -F${bar_fg} -f ${bar_font}"
-(echo "%{c} $@"; sleep ${duration}) | bar ${baropt}
+(echo "%{l} $@"; sleep ${duration}) | lemonbar -g ${w}x${h}+${x}+${y} -B${b} -F${f} -f 'Monaco for Powerline-11'
