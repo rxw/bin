@@ -12,18 +12,18 @@ clock() {
 }
 
 volume() {
-  vol=$(amixer get Master | sed -n 'N;s/^.*\[\([0-9]\+%\).*$/\1/p' | tr -d %)
+  vol=$(amixer get Master | grep Mono | sed 'N;s/.*\[\([0-9]\+\)%.*/\1/')
   rvol=$(( vol / 5 ))
   nvol=$(( 20 - rvol ))
   disp=""
   for((i=0; i < rvol; i++))
   do
-    disp="${disp}%{F#FFffFFff}─%{F-}"
+    disp="${disp}%{F#FFffFFff}-%{F-}"
   done
   disp="${disp}»"
   for((i=0; i < nvol; i++))
   do
-    disp="${disp}%{F#ff7f7f7f}─%{F-}"
+    disp="${disp}%{F#ff7f7f7f}-%{F-}"
   done
   echo "%{F${NEUTRAL}}vol%{F-} $disp"
 }
@@ -119,15 +119,15 @@ while :; do
    # buf="${buf} RAM: $(memused)%% -"
    # buf="${buf} %{c}$(windows)"
    # buf="${buf} %{r} %{B#FFfafafa}%{F#FF37393d} $(volume)  "
-    buf="${buf} %{l} $(nowplaying) "
+   # buf="${buf} %{l} $(nowplaying) "
    # buf="${buf}  $(battery)% "
     buf="${buf} %{r} $(clock) "
     buf="${buf} %{r} "
     buf="${buf} %{r} $(nowplaying) "
-    buf="${buf}  $(battery)%% "
+    buf="${buf}  $(battery)% "
     buf="${buf}  $(clock) "
     buf="${buf}  %{r} %{B-}%{F-}"
 
     echo $buf
-    sleep 1 # The HUD will be updated every second
+    sleep .25 # The HUD will be updated every second
 done
