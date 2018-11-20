@@ -14,7 +14,7 @@ cp $image "$folder/wp.png"
 
 # Generate colorscheme
 cont=0
-for i in $(colors -en 16 $image )
+for i in $(colors -en 16 -p < $image )
 do
   case $cont in
     1)
