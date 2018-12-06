@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # z3bra - (c) wtfpl 2014
 # Fetch infos on your computer, and print them to stdout every second.
@@ -12,7 +12,7 @@ clock() {
 }
 
 volume() {
-  vol=$(amixer get Master | grep Mono | sed 'N;s/.*\[\([0-9]\+\)%.*/\1/')
+  vol=$(amixer -c 1 get Master | grep Mono: | grep -oP '\d+\D+\K\d+' | head -1)
   rvol=$(( vol / 5 ))
   nvol=$(( 20 - rvol ))
   disp=""
@@ -123,7 +123,7 @@ while :; do
    # buf="${buf}  $(battery)% "
     buf="${buf} %{r} $(clock) "
     buf="${buf} %{r} "
-    buf="${buf} %{r} $(nowplaying) "
+   # buf="${buf} %{r} $(nowplaying) "
     buf="${buf}  $(battery)% "
     buf="${buf}  $(clock) "
     buf="${buf}  %{r} %{B-}%{F-}"
