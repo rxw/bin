@@ -1,6 +1,6 @@
 #!/bin/bash
 
-font="*-clean-medium-r-*-*-15-*-*-*-*-*-*-*"
+font="*-proggycleancp-medium-*-*-*-13-*-*-*-*-*-*-*"
 fbfont="*-stlarch-medium-*-*-*-10-*-*-*-*-*-*-*"
 
 colorea() {
