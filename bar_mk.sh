@@ -12,7 +12,7 @@ clock() {
 }
 
 volume() {
-  vol=$(amixer -c 1 get Master | grep Mono: | grep -oP '\d+\D+\K\d+' | head -1)
+  vol=$(amixer get Master | grep -oP '\d+\D+\K\d+\%' | head -1 | tr -d %)
   rvol=$(( vol / 5 ))
   nvol=$(( 20 - rvol ))
   disp=""
@@ -45,7 +45,7 @@ volume() {
 #}
 
 nowplaying() {
-    cur=`mpc current`
+    cur=`playerctl metadata title`
     # this line allow to choose whether the output will scroll or not
     echo " $cur"
 }
@@ -82,11 +82,6 @@ groups() {
   echo "%{F${NEUTRAL}}DSKTP%{F-} $cur"
 }
 
-nowplaying() {
-    cur=`mpc current`
-    echo "%{F${NEUTRAL}}playing%{F-} $cur"
-}
-
 battery() {
   BATN=$(ls /sys/class/power_supply/ | grep BAT)
   test -z "$BATN" && exit 1
@@ -119,7 +114,7 @@ while :; do
    # buf="${buf} RAM: $(memused)%% -"
    # buf="${buf} %{c}$(windows)"
    # buf="${buf} %{r} %{B#FFfafafa}%{F#FF37393d} $(volume)  "
-   # buf="${buf} %{l} $(nowplaying) "
+    buf="${buf} $(nowplaying) "
    # buf="${buf}  $(battery)% "
     buf="${buf} %{r} $(clock) "
     buf="${buf} %{r} "
